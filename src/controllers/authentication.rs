@@ -4,7 +4,7 @@ use actix_web::{HttpResponse, error::Error as ActixError, post, web};
 
 use crate::middlewares::validation::Validator;
 
-#[derive(Debug, Validate, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Validate, serde::Deserialize, serde::Serialize, Clone)]
 pub struct LoginBody {
     #[validate(email)]
     email: String,
@@ -14,7 +14,7 @@ pub struct LoginBody {
 
 
 #[post("/authentication")]
-pub async fn login(body: Validator<LoginBody>, opt_flag: Option<web::ReqData<u32>>) -> Result<HttpResponse, ActixError> {
+pub async fn login(body: Validator<LoginBody, web::Json<LoginBody>>, opt_flag: Option<web::ReqData<u32>>) -> Result<HttpResponse, ActixError> {
     let payload = body.into_inner();
 
     println!("{:?}", opt_flag); // test middleware
