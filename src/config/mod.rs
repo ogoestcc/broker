@@ -1,11 +1,13 @@
 mod logger;
 mod services;
+mod auth;
 
 pub use logger::logger;
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(Debug, serde::Deserialize, Default, Clone)]
 pub struct Config {
     pub port: u16,
+    pub auth: auth::Auth,
     recommender: services::Service,
     database: services::Service,
 }
