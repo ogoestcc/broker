@@ -8,8 +8,8 @@ pub use logger::logger;
 pub struct Config {
     pub port: u16,
     pub auth: auth::Auth,
-    recommender: services::Service,
-    database: services::Service,
+    pub recommender: services::Service,
+    pub database: services::Service,
 }
 
 impl Config {

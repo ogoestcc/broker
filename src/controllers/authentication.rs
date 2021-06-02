@@ -1,8 +1,14 @@
+use std::sync::{Arc, Mutex};
+
 use validator::Validate;
 
-use actix_web::{HttpResponse, error::Error as ActixError, post, web};
+use actix_web::{error::Error as ActixError, post, web, HttpResponse};
 
-use crate::middlewares::validation::Validator;
+use crate::{
+    grpc::database::DatabaseService,
+    middlewares::validation::Validator,
+    resources::errors::{auth::AuthError, ServiceError},
+};
 
 #[derive(Debug, Validate, serde::Deserialize, serde::Serialize, Clone)]
 pub struct LoginBody {
@@ -12,16 +18,22 @@ pub struct LoginBody {
     password: String,
 }
 
-
 #[post("/authentication")]
-pub async fn login(body: Validator<LoginBody, web::Json<LoginBody>>, opt_flag: Option<web::ReqData<u32>>) -> Result<HttpResponse, ActixError> {
+pub async fn login(
+    body: Validator<LoginBody, web::Json<LoginBody>>,
+    db: web::Data<Arc<Mutex<DatabaseService>>>,
+) -> Result<HttpResponse, ActixError> {
+    let mut db = db.lock().unwrap();
     let payload = body.into_inner();
 
-    println!("{:?}", opt_flag); // test middleware
+    let user = db.get_user_by_email(&payload.email)
+        .await?;
+
+    println!("{:?}", user);
+
+    // println!("{:?}", opt_flag); // test middleware
 
     // TODO create login
 
     Ok(HttpResponse::Ok().json(payload))
 }
-
-

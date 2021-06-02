@@ -7,14 +7,16 @@ pub enum AuthError {
     InvalidRequest(String),
     TokenNotFound,
     InvalidToken,
+    Unauthorized,
 }
 
 impl ErrorKind for AuthError {
     fn code(&self) -> u16 {
         match self {
-            AuthError::InvalidRequest(_) => 0,
-            AuthError::TokenNotFound => 1,
-            AuthError::InvalidToken => 2,
+            AuthError::InvalidRequest(_) => 1,
+            AuthError::TokenNotFound => 2,
+            AuthError::InvalidToken => 3,
+            AuthError::Unauthorized => 4,
         }
     }
 
@@ -23,6 +25,7 @@ impl ErrorKind for AuthError {
             AuthError::InvalidRequest(_) => r"Invalid body request, see the documentation.".into(),
             AuthError::TokenNotFound => r"Token must be provided".into(),
             AuthError::InvalidToken => r"Token provided isn't valid".into(),
+            AuthError::Unauthorized => r"Access denied".into(),
         }
     }
 
@@ -30,15 +33,14 @@ impl ErrorKind for AuthError {
         match self {
             AuthError::InvalidRequest(_) => StatusCode::BAD_REQUEST,
             AuthError::TokenNotFound => StatusCode::FORBIDDEN,
-            AuthError::InvalidToken => StatusCode::UNAUTHORIZED,
+            _ => StatusCode::UNAUTHORIZED,
         }
     }
 
     fn report(&self) -> Option<String> {
         match self {
             AuthError::InvalidRequest(report) => Some(report.to_owned()),
-            AuthError::TokenNotFound => None,
-            AuthError::InvalidToken => None,
+            _ => None,
         }
     }
 }

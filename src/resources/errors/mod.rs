@@ -1,6 +1,7 @@
 use actix_web::{ResponseError, http::{StatusCode, header}};
 
 pub mod auth;
+pub mod users;
 
 #[derive(Debug, serde::Serialize)]
 pub struct ErrorMessage {
@@ -63,5 +64,26 @@ impl<K: ErrorKind + std::fmt::Debug> ResponseError
             header::HeaderValue::from_static("application/json; charset=utf-8"),
         );
         resp.set_body(actix_web::dev::Body::from(self.to_string()))
+    }
+}
+
+#[derive(Debug)]
+pub struct InternalServerError(pub Option<String>);
+
+impl ErrorKind for InternalServerError {
+    fn code(&self) -> u16 {
+        0
+    }
+
+    fn message(&self) -> String {
+        "Internal Server Error".to_owned()
+    }
+
+    fn status_code(&self) -> StatusCode {
+        StatusCode::INTERNAL_SERVER_ERROR
+    }
+
+    fn report(&self) -> Option<String> {
+        self.0.clone()
     }
 }
