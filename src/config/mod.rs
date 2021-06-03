@@ -1,6 +1,6 @@
+mod auth;
 mod logger;
 mod services;
-mod auth;
 
 pub use logger::logger;
 

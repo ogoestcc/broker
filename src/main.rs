@@ -31,9 +31,11 @@ async fn main() -> std::io::Result<()> {
 
     env_logger::Builder::from_env(Env::default().default_filter_or(r"info,broker")).init();
 
-    let db_service = Arc::new(Mutex::new(grpc::database::DatabaseService::connect(
-        database_addr.clone(),
-    ).await.unwrap()));
+    let db_service = Arc::new(Mutex::new(
+        grpc::database::DatabaseService::connect(database_addr.clone())
+            .await
+            .unwrap(),
+    ));
 
     HttpServer::new(move || {
         App::new()

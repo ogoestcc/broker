@@ -1,4 +1,7 @@
-use actix_web::{ResponseError, http::{StatusCode, header}};
+use actix_web::{
+    http::{header, StatusCode},
+    ResponseError,
+};
 
 pub mod auth;
 pub mod users;
@@ -50,9 +53,7 @@ impl<K: ErrorKind> std::fmt::Display for ServiceError<K> {
     }
 }
 
-impl<K: ErrorKind + std::fmt::Debug> ResponseError
-    for ServiceError<K>
-{
+impl<K: ErrorKind + std::fmt::Debug> ResponseError for ServiceError<K> {
     fn status_code(&self) -> StatusCode {
         self.0.status_code()
     }

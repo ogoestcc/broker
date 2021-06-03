@@ -1,7 +1,6 @@
-
 mod users;
 
-use protos::{Client, database};
+use protos::{database, Client};
 
 #[derive(Debug, Clone)]
 pub struct DatabaseService {
@@ -13,7 +12,7 @@ impl DatabaseService {
         let endpoint = endpoint.to_string();
 
         Ok(Self {
-            db: database::Database::connect(endpoint.as_str()).await?
+            db: database::Database::connect(endpoint.as_str()).await?,
         })
     }
 }

@@ -10,7 +10,6 @@ impl DatabaseService {
         &mut self,
         email: &String,
     ) -> Result<users::User, ServiceError<UsersError>> {
-
         let mut r#where = users::WhereClause::default();
         r#where.set_email(email.to_owned());
 

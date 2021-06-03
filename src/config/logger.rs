@@ -8,4 +8,4 @@ pub fn logger() -> Logger {
 #[cfg(debug_assertions)]
 pub fn logger() -> Logger {
     Logger::default()
-} 
+}
