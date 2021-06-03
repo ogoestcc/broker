@@ -6,6 +6,8 @@ pub struct Auth {
     #[serde(default)]
     pub secret_ad: String,
     pub hash_salt: String,
+    #[serde(default = "exp_default")]
+    pub token_expiration: u64,
 }
 
 impl Auth {
@@ -43,4 +45,16 @@ impl Auth {
 
         argon2::verify_encoded_ext(hash, password, secret, ad).unwrap()
     }
+
+    pub fn get_token_exp(&self) -> u64 {
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_secs()
+            + self.token_expiration
+    }
+}
+
+fn exp_default() -> u64 {
+    (1 * 24 * 60 * 60) as u64 // one day in seconds
 }

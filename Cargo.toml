@@ -3,6 +3,7 @@ authors = ["ogoes <otavio@ogoes.dev>"]
 edition = "2018"
 name = "broker"
 version = "0.1.0"
+default-run = "broker"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

@@ -51,6 +51,7 @@ pub async fn login(
         id: user.get_id() as u32,
         email: user.get_email().into(),
         active: user.get_active(),
+        exp: auth.get_token_exp(),
     };
 
     Ok(HttpResponse::Ok().json(LoginResponse {
