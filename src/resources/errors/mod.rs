@@ -36,13 +36,13 @@ pub enum ServiceError<K>
 where
     K: ErrorKind,
 {
-    BadRequest(K),          // 400
-    Unauthorized(K),        // 401
-    Forbidden(K),           // 403
+    BadRequest(K),   // 400
+    Unauthorized(K), // 401
+    Forbidden(K),    // 403
     #[allow(dead_code)]
     NotFound(K),
     #[allow(dead_code)]
-    PreconditionFailed(K),  // 412
+    PreconditionFailed(K), // 412
     InternalServerError(K), // 500
 }
 
@@ -104,7 +104,6 @@ where
 
         ErrorBody { error }
     }
-
 }
 
 impl<K: ErrorKind> std::fmt::Display for ServiceError<K> {
@@ -152,7 +151,6 @@ impl<K: std::error::Error> ErrorKind for K {
         Some(self.to_string())
     }
 }
-
 
 #[derive(Debug)]
 pub struct InternalServerError(String); // just for have a concrete error type

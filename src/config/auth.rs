@@ -31,12 +31,7 @@ impl Auth {
             ..Default::default()
         };
 
-        argon2::hash_encoded(
-            password.as_bytes(),
-            self.hash_salt.as_bytes(),
-            &config,
-        )
-        .unwrap()
+        argon2::hash_encoded(password.as_bytes(), self.hash_salt.as_bytes(), &config).unwrap()
     }
 
     pub fn verify_password(&self, hash: &str, password: &[u8]) -> bool {

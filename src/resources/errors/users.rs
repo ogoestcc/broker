@@ -29,14 +29,14 @@ impl ErrorKind for UsersError {
     fn message(&self) -> String {
         match self {
             Self::Internal(internal) => internal.message(),
-            _ => self.to_string()
+            _ => self.to_string(),
         }
     }
 
     fn report(&self) -> Option<String> {
         match self {
             Self::Internal(internal) => internal.report(),
-            _ => None
+            _ => None,
         }
     }
 }
