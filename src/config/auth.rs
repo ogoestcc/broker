@@ -17,10 +17,10 @@ impl Auth {
         (secret, ad)
     }
 
-    fn get_config(&self) -> Argon2Config {
+    pub fn hash_password(&self, password: &String) -> String {
         let (secret, ad) = self.get_secret_and_ad();
 
-        Argon2Config {
+        let config = Argon2Config {
             variant: Variant::Argon2i,
             version: Version::Version13,
             thread_mode: ThreadMode::Parallel,
@@ -28,14 +28,12 @@ impl Auth {
             ad,
             hash_length: 32,
             ..Default::default()
-        }
-    }
+        };
 
-    pub fn hash_password(&self, password: &String) -> String {
         argon2::hash_encoded(
             password.as_bytes(),
             self.hash_salt.as_bytes(),
-            &self.get_config(),
+            &config,
         )
         .unwrap()
     }

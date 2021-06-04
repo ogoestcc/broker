@@ -1,9 +1,4 @@
-use std::time::{Duration, UNIX_EPOCH};
-
-
-// use time;
-
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
 pub struct Claims {
     pub id: u32,
     pub email: String,

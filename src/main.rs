@@ -7,7 +7,6 @@ mod resources;
 mod routes;
 mod utils;
 
-use protos::Client;
 use std::sync::{Arc, Mutex};
 
 use actix_web::{
@@ -17,22 +16,25 @@ use actix_web::{
 };
 
 use env_logger::Env;
-// use grpc::database::DatabaseService;
+
+use grpc::{database::DatabaseService, recommender::RecommenderService};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    env_logger::Builder::from_env(Env::default().default_filter_or(r"info,broker")).init();
     dotenv::dotenv().ok();
+
     let config = config::Config::from_env().unwrap();
     let addr = config.server_addr();
 
-    let database_config = &config.database;
-
-    let database_addr = format!("{}:{}", database_config.host, database_config.port);
-
-    env_logger::Builder::from_env(Env::default().default_filter_or(r"info,broker")).init();
-
     let db_service = Arc::new(Mutex::new(
-        grpc::database::DatabaseService::connect(database_addr.clone())
+        DatabaseService::connect(config.database.to_string())
+            .await
+            .unwrap(),
+    ));
+
+    let recommender = Arc::new(Mutex::new(
+        RecommenderService::connect(config.recommender.to_string())
             .await
             .unwrap(),
     ));
@@ -44,6 +46,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(config::logger())
             .data(config.clone())
             .data(db_service.clone())
+            .data(recommender.clone())
             .configure(routes::config)
     })
     .bind(addr)?
