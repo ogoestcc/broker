@@ -6,49 +6,55 @@ pub mod users;
 pub mod validation;
 
 #[derive(Debug, serde::Serialize)]
-pub struct ErrorMessage {
+pub struct ErrorMessage<K: serde::Serialize> {
     pub code: u16,
     pub message: String,
     #[cfg_attr(not(debug_assertions), serde(skip))]
-    pub report: Option<String>,
+    pub report: Option<K>,
 }
 
 #[derive(Debug, serde::Serialize)]
-struct ErrorBody {
-    error: ErrorMessage,
+struct ErrorBody<K: serde::Serialize> {
+    error: ErrorMessage<K>,
 }
 
 pub trait ErrorKind: Sized {
-    fn code(&self) -> u16;
-    fn message(&self) -> String;
+    fn code(&self) -> u16 {
+        Default::default()
+    }
 
-    fn report(&self) -> Option<String> {
-        None
+    fn message(&self) -> String {
+        Default::default()
+    }
+
+    type Report;
+
+    fn report(&self) -> Option<Self::Report> {
+        Default::default()
     }
 
     fn from_none() -> Option<Self> {
-        None
+        Default::default()
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize)]
 pub enum ServiceError<K>
 where
     K: ErrorKind,
 {
-    BadRequest(K),   // 400
-    Unauthorized(K), // 401
-    Forbidden(K),    // 403
-    #[allow(dead_code)]
-    NotFound(K),
-    #[allow(dead_code)]
-    PreconditionFailed(K), // 412
+    BadRequest(K),          // 400
+    Unauthorized(K),        // 401
+    Forbidden(K),           // 403
+    NotFound(K),            // 404
+    PreconditionFailed(K),  // 412
     InternalServerError(K), // 500
 }
 
-impl<K> ServiceError<K>
+impl<K, R> ServiceError<K>
 where
-    K: ErrorKind,
+    K: serde::Serialize + ErrorKind<Report = R>,
+    R: serde::Serialize,
 {
     pub fn bad_request(kind: K) -> Self {
         Self::BadRequest(kind)
@@ -62,7 +68,6 @@ where
         Self::Forbidden(kind)
     }
 
-    #[allow(dead_code)]
     pub fn not_found(kind: K) -> Self {
         Self::NotFound(kind)
     }
@@ -87,7 +92,7 @@ where
         }
     }
 
-    fn get_error_body(&self) -> ErrorBody {
+    fn get_error_body(&self) -> ErrorBody<R> {
         let kind = self.kind();
 
         let message = if let Self::InternalServerError(_) = self {
@@ -106,13 +111,24 @@ where
     }
 }
 
-impl<K: ErrorKind> std::fmt::Display for ServiceError<K> {
+impl<K, R> std::fmt::Display for ServiceError<K>
+where
+    R: serde::Serialize,
+    K: ErrorKind<Report = R> + std::fmt::Debug + serde::Serialize, {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}", self.get_error_body().error)
+        write!(
+            f,
+            "{:?}",
+            self
+        )
     }
 }
 
-impl<K: ErrorKind + std::fmt::Debug> ResponseError for ServiceError<K> {
+impl<K, R> ResponseError for ServiceError<K>
+where
+    R: serde::Serialize,
+    K: ErrorKind<Report = R> + std::fmt::Debug + serde::Serialize,
+{
     fn status_code(&self) -> StatusCode {
         match self {
             Self::BadRequest(_) => StatusCode::BAD_REQUEST,
@@ -138,21 +154,14 @@ impl<K: ErrorKind + std::fmt::Debug> ResponseError for ServiceError<K> {
     }
 }
 
-impl<K: std::error::Error> ErrorKind for K {
-    fn code(&self) -> u16 {
-        0
-    }
-
-    fn message(&self) -> String {
-        "".into()
-    }
-
-    fn report(&self) -> Option<String> {
-        Some(self.to_string())
+impl<K: std::error::Error + Clone> ErrorKind for K {
+    type Report = K;
+    fn report(&self) -> Option<Self::Report> {
+        Some(self.to_owned())
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Serialize, Clone)]
 pub struct InternalServerError(String); // just for have a concrete error type
 
 impl Display for InternalServerError {
@@ -168,16 +177,13 @@ impl<E: Error> From<E> for InternalServerError {
 }
 
 impl ErrorKind for InternalServerError {
-    fn code(&self) -> u16 {
-        0
-    }
-
     fn message(&self) -> String {
         r"Recommender Request Error".to_owned()
     }
 
-    fn report(&self) -> Option<String> {
-        Some(self.0.to_owned())
+    type Report = Self;
+    fn report(&self) -> Option<Self::Report> {
+        Some(self.to_owned())
     }
 
     fn from_none() -> Option<Self> {

@@ -2,11 +2,11 @@ use crate::resources::errors::ErrorKind;
 
 use super::ServiceError;
 
-#[derive(Debug)]
+#[derive(Debug, serde::Serialize)]
 pub enum AuthError {
     InvalidToken,
     MissingToken,
-    UserNotFoundOrInvalidPassword(Option<String>),
+    UserNotFoundOrInvalidPassword(Option<std::string::String>),
 }
 
 impl AuthError {
@@ -32,7 +32,8 @@ impl ErrorKind for AuthError {
         }
     }
 
-    fn report(&self) -> Option<String> {
+    type Report = String;
+    fn report(&self) -> Option<Self::Report> {
         match self {
             Self::UserNotFoundOrInvalidPassword(report) => report.to_owned(),
             _ => None,

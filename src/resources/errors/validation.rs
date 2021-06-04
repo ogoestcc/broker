@@ -2,7 +2,7 @@ use std::{error::Error, fmt::Display};
 
 use super::ServiceError;
 
-#[derive(Debug)]
+#[derive(Debug, serde::Serialize)]
 pub struct ValidationError(String); // just for have a concrete error type for request validations
 
 impl Display for ValidationError {
@@ -26,6 +26,7 @@ impl super::ErrorKind for ValidationError {
         r"Invalid Request".to_owned()
     }
 
+    type Report = String;
     fn report(&self) -> Option<String> {
         Some(self.0.to_owned())
     }

@@ -4,7 +4,7 @@ use crate::resources::errors::ErrorKind;
 
 use super::{InternalServerError, ServiceError};
 
-#[derive(Debug)]
+#[derive(Debug, serde::Serialize)]
 pub enum UsersError {
     NotFound,
     Inactive,
@@ -33,7 +33,8 @@ impl ErrorKind for UsersError {
         }
     }
 
-    fn report(&self) -> Option<String> {
+    type Report = InternalServerError;
+    fn report(&self) -> Option<Self::Report> {
         match self {
             Self::Internal(internal) => internal.report(),
             _ => None,
