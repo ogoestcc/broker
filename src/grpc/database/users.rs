@@ -32,14 +32,14 @@ impl DatabaseService {
             .get_users()
             .get(0)
             .ok_or_else(UsersError::not_found)
-            .map_err(ServiceError::internal)?;
+            .map_err(ServiceError::not_found)?;
 
         if user.has_active() && !user.get_active() {
-            Err(UsersError::Inactive).map_err(ServiceError::internal)?;
+            Err(UsersError::Inactive).map_err(ServiceError::not_found)?;
         }
 
         if user.has_deleted_at() {
-            Err(UsersError::Inactive).map_err(ServiceError::internal)?;
+            Err(UsersError::Inactive).map_err(ServiceError::not_found)?;
         }
 
         Ok(user.to_owned())
