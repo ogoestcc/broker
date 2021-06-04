@@ -17,6 +17,7 @@ impl Auth {
         (secret, ad)
     }
 
+    #[allow(dead_code)]
     pub fn hash_password(&self, password: &String) -> String {
         let (secret, ad) = self.get_secret_and_ad();
 

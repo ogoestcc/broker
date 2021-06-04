@@ -16,19 +16,32 @@ impl DatabaseService {
         let mut req = users::get_users::Request::default();
         req.set_field_where(r#where);
 
-        let receiver = self.db.users.get_users_async(&req);
+        let receiver = self
+            .db
+            .users
+            .get_users_async(&req)
+            .map_err(UsersError::from)
+            .map_err(ServiceError::internal)?;
 
-        match receiver {
-            Ok(receiver) => match receiver.await {
-                Ok(response) => match response.get_users().get(0) {
-                    Some(user) => Ok(user.clone()),
-                    None => {
-                        return Err(ServiceError::new(UsersError::NotFound));
-                    }
-                },
-                Err(err) => Err(ServiceError::new(UsersError::Error(err.to_string()))),
-            },
-            Err(err) => Err(ServiceError::new(UsersError::Error(err.to_string()))),
+        let response = receiver
+            .await
+            .map_err(UsersError::from)
+            .map_err(ServiceError::internal)?;
+
+        let user = response
+            .get_users()
+            .get(0)
+            .ok_or_else(UsersError::not_found)
+            .map_err(ServiceError::internal)?;
+
+        if user.has_active() && !user.get_active() {
+            Err(UsersError::Inactive).map_err(ServiceError::internal)?;
         }
+
+        if user.has_deleted_at() {
+            Err(UsersError::Inactive).map_err(ServiceError::internal)?;
+        }
+
+        Ok(user.to_owned())
     }
 }

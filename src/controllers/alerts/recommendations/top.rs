@@ -5,10 +5,8 @@ use validator::Validate;
 use actix_web::{error::Error as ActixError, get, web, HttpResponse};
 
 use crate::{
-    grpc::recommender::RecommenderService,
-    middlewares::validation::Validator,
+    grpc::recommender::RecommenderService, middlewares::validation::Validator,
     models::alerts::Alert,
-    resources::errors::{InternalServerError, ServiceError},
 };
 
 fn n_default() -> Option<u32> {
@@ -39,10 +37,7 @@ pub async fn top_alerts(
 
     let recommender = recommender.lock().unwrap();
 
-    let proto_alerts = recommender
-        .top_n(query.n, query.content)
-        .await
-        .map_err(|err| ServiceError::new(InternalServerError(Some(err.to_string()))))?;
+    let proto_alerts = recommender.top_n(query.n, query.content).await?;
 
     drop(recommender); // unlock before mapping
 

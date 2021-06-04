@@ -5,7 +5,8 @@ use std::pin::Pin;
 use std::rc::Rc;
 use validator::Validate;
 
-use crate::resources::errors::{auth::AuthError, ServiceError};
+use crate::resources::errors::validation::ValidationError;
+use crate::resources::errors::ServiceError;
 
 #[derive(Clone)]
 pub struct Validator<O, T>(O, Rc<T>)
@@ -33,11 +34,12 @@ where
     }
 }
 
-impl<O: 'static + Clone> FromRequest for Validator<O, Json<O>>
+impl<O> FromRequest for Validator<O, Json<O>>
 where
     O: Validate + for<'de> serde::Deserialize<'de>,
+    O: 'static + Clone,
 {
-    type Error = ServiceError<AuthError>;
+    type Error = ServiceError<ValidationError>;
 
     type Future = Pin<Box<dyn Future<Output = Result<Validator<O, Json<O>>, Self::Error>>>>;
 
@@ -49,14 +51,16 @@ where
     ) -> Self::Future {
         let json = <Json<O>>::from_request(req, payload);
         Box::pin(async {
-            let json =
-                Rc::new(json.await.map_err(|err| {
-                    ServiceError::new(AuthError::InvalidRequest(err.to_string()))
-                })?);
+            let json = Rc::new(
+                json.await
+                    .map_err(ValidationError::from)
+                    .map_err(ServiceError::bad_request)?,
+            );
 
             json.validate()
                 .map(|_| Ok(Validator((*json).0.clone(), json.clone())))
-                .map_err(|err| ServiceError::new(AuthError::InvalidRequest(err.to_string())))?
+                .map_err(ValidationError::from)
+                .map_err(ServiceError::bad_request)?
         })
     }
 }
@@ -65,7 +69,7 @@ impl<O: 'static + Clone> FromRequest for Validator<O, Query<O>>
 where
     O: Validate + for<'de> serde::Deserialize<'de>,
 {
-    type Error = ServiceError<AuthError>;
+    type Error = ServiceError<ValidationError>;
 
     type Future = Pin<Box<dyn Future<Output = Result<Validator<O, Query<O>>, Self::Error>>>>;
 
@@ -77,15 +81,18 @@ where
     ) -> Self::Future {
         let query = <Query<O>>::from_request(req, payload);
         Box::pin(async {
-            let query =
-                Rc::new(query.await.map_err(|err| {
-                    ServiceError::new(AuthError::InvalidRequest(err.to_string()))
-                })?);
+            let query = Rc::new(
+                query
+                    .await
+                    .map_err(ValidationError::from)
+                    .map_err(ServiceError::bad_request)?,
+            );
 
             query
                 .validate()
                 .map(|_| Ok(Validator((*query).0.clone(), query.clone())))
-                .map_err(|err| ServiceError::new(AuthError::InvalidRequest(err.to_string())))?
+                .map_err(ValidationError::from)
+                .map_err(ServiceError::bad_request)?
         })
     }
 }

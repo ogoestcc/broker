@@ -39,12 +39,13 @@ pub async fn login(
     let user = db
         .get_user_by_email(&payload.email)
         .await
-        .map_err(|_| ServiceError::new(AuthError::Forbidden(1, None)))?;
+        .map_err(AuthError::authentication_error)
+        .map_err(ServiceError::forbidden)?;
     drop(db); // unlock db mutex
 
     let valid_password = auth.verify_password(user.get_password(), payload.password.as_bytes());
     if !valid_password {
-        return Err(ServiceError::new(AuthError::Unauthorized(2, None)).into());
+        Err(AuthError::UserNotFoundOrInvalidPassword(None)).map_err(ServiceError::forbidden)?;
     }
 
     let user_claims = Claims {

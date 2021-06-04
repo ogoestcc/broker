@@ -1,3 +1,4 @@
+use crate::resources::errors::{InternalServerError, ServiceError};
 use protos::{recommender, types::alerts::Alert, Client};
 
 #[derive(Debug, Clone)]
@@ -20,7 +21,7 @@ impl RecommenderService {
         &self,
         n: Option<u32>,
         content: Option<String>,
-    ) -> Result<Vec<Alert>, Box<dyn std::error::Error>> {
+    ) -> Result<Vec<Alert>, ServiceError<InternalServerError>> {
         let mut request = recommender::top::Request::default();
         request.set_alerts_number(n.unwrap_or(20));
 
@@ -28,8 +29,17 @@ impl RecommenderService {
             request.set_content(content);
         }
 
-        let unary_receiver = self.recommender.top_n_async(&request)?;
-        let response = unary_receiver.await?;
+        let unary_receiver = self
+            .recommender
+            .top_n_async(&request)
+            .map_err(InternalServerError::from)
+            .map_err(ServiceError::internal)?;
+
+        let response = unary_receiver
+            .await
+            .map_err(InternalServerError::from)
+            .map_err(ServiceError::internal)?;
+
         Ok(response.get_alerts().to_vec())
     }
 }
