@@ -126,7 +126,7 @@ impl<K: ErrorKind + std::fmt::Debug> ResponseError for ServiceError<K> {
 
     fn error_response(&self) -> HttpResponse {
         let mut builder = match self {
-            Self::BadRequest(_) => HttpResponse::BadGateway(),
+            Self::BadRequest(_) => HttpResponse::BadRequest(),
             Self::Unauthorized(_) => HttpResponse::Unauthorized(),
             Self::Forbidden(_) => HttpResponse::Forbidden(),
             Self::NotFound(_) => HttpResponse::NotFound(),
@@ -182,5 +182,11 @@ impl ErrorKind for InternalServerError {
 
     fn from_none() -> Option<Self> {
         Some(Self("None Value".to_owned()))
+    }
+}
+
+impl From<InternalServerError> for ServiceError<InternalServerError> {
+    fn from(err: InternalServerError) -> Self {
+        Self::internal(err)
     }
 }

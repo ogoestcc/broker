@@ -2,7 +2,7 @@ use std::{error::Error, fmt::Display};
 
 use crate::resources::errors::ErrorKind;
 
-use super::InternalServerError;
+use super::{InternalServerError, ServiceError};
 
 #[derive(Debug)]
 pub enum UsersError {
@@ -60,5 +60,14 @@ impl Display for UsersError {
 impl<E: Error> From<E> for UsersError {
     fn from(err: E) -> Self {
         Self::Internal(InternalServerError::from(err))
+    }
+}
+
+impl From<UsersError> for ServiceError<UsersError> {
+    fn from(err: UsersError) -> Self {
+        match err {
+            UsersError::Internal(_) => Self::internal(err),
+            _ => Self::not_found(err),
+        }
     }
 }

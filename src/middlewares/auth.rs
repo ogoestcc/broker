@@ -61,11 +61,11 @@ where
                     Either::Left(self.0.call(req))
                 }
                 Err(_) => Either::Right(future::err(
-                    ServiceError::unauthorized(AuthError::InvalidToken).into(),
+                    ServiceError::from(AuthError::InvalidToken).into(),
                 )),
             },
             None => Either::Right(future::err(
-                ServiceError::forbidden(AuthError::MissingToken).into(),
+                ServiceError::from(AuthError::MissingToken).into(),
             )),
         }
     }

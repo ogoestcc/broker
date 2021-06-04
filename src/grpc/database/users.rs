@@ -20,26 +20,21 @@ impl DatabaseService {
             .db
             .users
             .get_users_async(&req)
-            .map_err(UsersError::from)
-            .map_err(ServiceError::internal)?;
+            .map_err(UsersError::from)?;
 
-        let response = receiver
-            .await
-            .map_err(UsersError::from)
-            .map_err(ServiceError::internal)?;
+        let response = receiver.await.map_err(UsersError::from)?;
 
         let user = response
             .get_users()
             .get(0)
-            .ok_or_else(UsersError::not_found)
-            .map_err(ServiceError::not_found)?;
+            .ok_or_else(UsersError::not_found)?;
 
         if user.has_active() && !user.get_active() {
-            Err(UsersError::Inactive).map_err(ServiceError::not_found)?;
+            Err(UsersError::Inactive)?;
         }
 
         if user.has_deleted_at() {
-            Err(UsersError::Inactive).map_err(ServiceError::not_found)?;
+            Err(UsersError::Inactive)?;
         }
 
         Ok(user.to_owned())

@@ -1,5 +1,7 @@
 use crate::resources::errors::ErrorKind;
 
+use super::ServiceError;
+
 #[derive(Debug)]
 pub enum AuthError {
     InvalidToken,
@@ -34,6 +36,15 @@ impl ErrorKind for AuthError {
         match self {
             Self::UserNotFoundOrInvalidPassword(report) => report.to_owned(),
             _ => None,
+        }
+    }
+}
+
+impl From<AuthError> for ServiceError<AuthError> {
+    fn from(err: AuthError) -> Self {
+        match err {
+            AuthError::InvalidToken => ServiceError::unauthorized(err),
+            _ => ServiceError::forbidden(err),
         }
     }
 }

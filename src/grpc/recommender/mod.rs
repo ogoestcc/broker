@@ -32,14 +32,10 @@ impl RecommenderService {
         let unary_receiver = self
             .recommender
             .top_n_async(&request)
-            .map_err(InternalServerError::from)
-            .map_err(ServiceError::internal)?;
+            .map_err(InternalServerError::from)?;
 
-        let response = unary_receiver
-            .await
-            .map_err(InternalServerError::from)
-            .map_err(ServiceError::internal)?;
+        let response = unary_receiver.await.map_err(InternalServerError::from)?;
 
-        Ok(response.get_alerts().to_vec())
+        Ok(response.alerts.into_vec())
     }
 }

@@ -40,12 +40,14 @@ pub async fn login(
         .get_user_by_email(&payload.email)
         .await
         .map_err(AuthError::authentication_error)
-        .map_err(ServiceError::forbidden)?;
+        .map_err(ServiceError::from)?;
     drop(db); // unlock db mutex
 
     let valid_password = auth.verify_password(user.get_password(), payload.password.as_bytes());
     if !valid_password {
-        Err(AuthError::UserNotFoundOrInvalidPassword(None)).map_err(ServiceError::forbidden)?;
+        Err(r"Incorrect Password".to_owned())
+            .map_err(AuthError::authentication_error)
+            .map_err(ServiceError::from)?;
     }
 
     let user_claims = Claims {

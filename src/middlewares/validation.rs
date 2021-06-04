@@ -51,16 +51,11 @@ where
     ) -> Self::Future {
         let json = <Json<O>>::from_request(req, payload);
         Box::pin(async {
-            let json = Rc::new(
-                json.await
-                    .map_err(ValidationError::from)
-                    .map_err(ServiceError::bad_request)?,
-            );
+            let json = Rc::new(json.await.map_err(ValidationError::from)?);
 
             json.validate()
                 .map(|_| Ok(Validator((*json).0.clone(), json.clone())))
-                .map_err(ValidationError::from)
-                .map_err(ServiceError::bad_request)?
+                .map_err(ValidationError::from)?
         })
     }
 }
@@ -81,18 +76,12 @@ where
     ) -> Self::Future {
         let query = <Query<O>>::from_request(req, payload);
         Box::pin(async {
-            let query = Rc::new(
-                query
-                    .await
-                    .map_err(ValidationError::from)
-                    .map_err(ServiceError::bad_request)?,
-            );
+            let query = Rc::new(query.await.map_err(ValidationError::from)?);
 
             query
                 .validate()
                 .map(|_| Ok(Validator((*query).0.clone(), query.clone())))
-                .map_err(ValidationError::from)
-                .map_err(ServiceError::bad_request)?
+                .map_err(ValidationError::from)?
         })
     }
 }
