@@ -26,7 +26,7 @@ pub struct LoginResponse {
     token: String,
 }
 
-#[post("/authentication")]
+#[post("/authentication")]  // /api/authentication
 pub async fn login(
     body: Validator<LoginBody, web::Json<LoginBody>>,
     db: web::Data<Arc<Mutex<DatabaseService>>>,
