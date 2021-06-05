@@ -14,7 +14,7 @@ type Recommender = Arc<Mutex<RecommenderService>>;
 
 #[get("/collaborative_filtering")] // /api/alerts/collaborative_filtering
 pub async fn collaborative_filtering(
-    query: Validator<Request, web::Query<Request>>,
+    query: Validator<web::Query<Request>>,
     user: web::ReqData<Claims>,
     recommender: web::Data<Recommender>,
 ) -> Result<HttpResponse, ActixError> {
@@ -22,7 +22,9 @@ pub async fn collaborative_filtering(
 
     let recommender = recommender.lock().unwrap();
 
-    let proto_alerts = recommender.collaborative_filtering(user.id, query.n).await?;
+    let proto_alerts = recommender
+        .collaborative_filtering(user.id, query.n)
+        .await?;
 
     drop(recommender); // unlock before mapping
 

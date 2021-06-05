@@ -1,8 +1,5 @@
 use crate::resources::errors::InternalServerError;
-use protos::{
-    recommender::top,
-    types::alerts::Alert,
-};
+use protos::{recommender::top, types::alerts::Alert};
 
 use super::{Error, RecommenderService};
 

@@ -25,7 +25,7 @@ pub struct TopN {
 
 #[get("/top")] // /api/alerts/top
 pub async fn top_alerts(
-    query: Validator<TopN, web::Query<TopN>>,
+    query: Validator<web::Query<TopN>>,
     recommender: web::Data<Arc<Mutex<RecommenderService>>>,
 ) -> Result<HttpResponse, ActixError> {
     let query = query.into_inner();

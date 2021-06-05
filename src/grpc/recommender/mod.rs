@@ -1,8 +1,8 @@
 use crate::resources::errors::{InternalServerError, ServiceError};
-use protos::{Client, recommender};
+use protos::{recommender, Client};
 
-mod personalized;
 mod non_personalized;
+mod personalized;
 
 #[derive(Debug, Clone)]
 pub struct RecommenderService {

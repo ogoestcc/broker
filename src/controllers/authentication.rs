@@ -26,14 +26,13 @@ pub struct LoginResponse {
     token: String,
 }
 
-#[post("/authentication")]  // /api/authentication
+#[post("/authentication")] // /api/authentication
 pub async fn login(
-    body: Validator<LoginBody, web::Json<LoginBody>>,
+    payload: Validator<web::Json<LoginBody>>,
     db: web::Data<Arc<Mutex<DatabaseService>>>,
     config: web::Data<Config>,
 ) -> Result<HttpResponse, ActixError> {
     let auth = &config.auth;
-    let payload = body.into_inner();
 
     let mut db = db.lock().unwrap();
     let user = db

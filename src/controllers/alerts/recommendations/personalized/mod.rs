@@ -1,6 +1,5 @@
 use validator::Validate;
 
-
 #[path = "collaborative_filtering.rs"]
 mod cf;
 
@@ -14,5 +13,5 @@ pub struct Request {
     n: Option<u32>,
 }
 
-pub use cf::collaborative_filtering;
 pub use cb::content_based;
+pub use cf::collaborative_filtering;

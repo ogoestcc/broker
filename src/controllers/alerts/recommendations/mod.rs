@@ -1,4 +1,2 @@
-
-pub mod personalized;
 pub mod non_personalized;
-
+pub mod personalized;
