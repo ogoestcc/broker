@@ -27,3 +27,12 @@ pub mod get_users_and_ratings {
         GetUsersAndRatings_Response as Response, GetUsersAndRatings_UsersRatings as UserRatings,
     };
 }
+
+pub mod operations {
+    use super::proto_def::users;
+
+    pub use users::{
+        Operations_AllowedChanges as Payload, Operations_Create as Create,
+        Operations_Delete as Delete, Operations_Retrieve as Retrieve, Operations_Update as Update,
+    };
+}

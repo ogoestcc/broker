@@ -12,10 +12,10 @@ use crate::{
     utils::jwt,
 };
 
-pub struct Auth;
-pub struct AuthMiddleware<S>(S);
+pub struct Authorization;
+pub struct AuthorizationMiddleware<S>(S);
 
-impl<S, B> Transform<S> for Auth
+impl<S, B> Transform<S> for Authorization
 where
     S: Service<Request = ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
     S::Future: 'static,
@@ -25,15 +25,15 @@ where
     type Response = ServiceResponse<B>;
     type Error = Error;
     type InitError = ();
-    type Transform = AuthMiddleware<S>;
+    type Transform = AuthorizationMiddleware<S>;
     type Future = Ready<Result<Self::Transform, Self::InitError>>;
 
     fn new_transform(&self, service: S) -> Self::Future {
-        future::ok(AuthMiddleware(service))
+        future::ok(AuthorizationMiddleware(service))
     }
 }
 
-impl<S, B> Service for AuthMiddleware<S>
+impl<S, B> Service for AuthorizationMiddleware<S>
 where
     S: Service<Request = ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
     S::Future: 'static,

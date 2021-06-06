@@ -18,7 +18,7 @@ impl Auth {
     }
 
     #[allow(dead_code)]
-    pub fn hash_password(&self, password: &String) -> String {
+    pub fn hash_password(&self, password: &str) -> String {
         let (secret, ad) = self.get_secret_and_ad();
 
         let config = Argon2Config {
