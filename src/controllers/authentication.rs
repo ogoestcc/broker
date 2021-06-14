@@ -42,6 +42,8 @@ pub async fn login(
         .map_err(ServiceError::from)?;
     drop(db); // unlock db mutex
 
+    
+
     let valid_password = auth.verify_password(user.get_password(), payload.password.as_bytes());
     if !valid_password {
         Err(r"Incorrect Password".to_owned())

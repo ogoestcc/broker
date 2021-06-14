@@ -37,7 +37,10 @@ impl Auth {
     pub fn verify_password(&self, hash: &str, password: &[u8]) -> bool {
         let (secret, ad) = self.get_secret_and_ad();
 
-        argon2::verify_encoded_ext(hash, password, secret, ad).unwrap()
+        match argon2::verify_encoded_ext(hash, password, secret, ad) {
+            Ok(result) => result,
+            Err(_) => false,
+        }
     }
 
     pub fn get_token_exp(&self) -> u64 {

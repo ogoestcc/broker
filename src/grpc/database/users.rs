@@ -12,6 +12,7 @@ impl DatabaseService {
     ) -> Result<users::User, ServiceError<UsersError>> {
         let mut r#where = users::WhereClause::default();
         r#where.set_email(email.to_owned());
+        r#where.set_active(true);
 
         let mut req = users::get_users::Request::default();
         req.set_field_where(r#where);
