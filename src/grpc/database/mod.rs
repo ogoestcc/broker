@@ -1,3 +1,4 @@
+mod alerts;
 mod users;
 
 use protos::{database, Client};

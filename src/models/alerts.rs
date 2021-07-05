@@ -9,6 +9,7 @@ pub struct Alert {
     published_at: String,
     updated_at: String,
     description: String,
+    starred: Option<bool>,
 }
 
 impl From<ProtoAlert> for Alert {
@@ -21,6 +22,11 @@ impl From<ProtoAlert> for Alert {
             published_at: alert.take_published_at(),
             updated_at: alert.take_updated_at(),
             description: alert.take_description(),
+            starred: if alert.has_starred() {
+                Some(alert.get_starred())
+            } else {
+                None
+            },
         }
     }
 }

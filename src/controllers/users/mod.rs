@@ -1,4 +1,4 @@
 #[path = "create.rs"]
-mod C;
+mod c;
 
-pub use C::create_user as create;
+pub use c::create_user as create;

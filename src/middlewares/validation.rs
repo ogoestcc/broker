@@ -49,7 +49,6 @@ where
     type Error = ServiceError<ValidationError>;
 
     type Future = LocalBoxFuture<'static, Result<Validator<E>, Self::Error>>;
-
     type Config = ();
 
     fn from_request(

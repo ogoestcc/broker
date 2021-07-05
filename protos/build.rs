@@ -1,6 +1,5 @@
 use std::env;
 
-
 fn main() {
     let out_dir = env::var("OUT_DIR").unwrap();
 
@@ -18,11 +17,7 @@ fn main() {
 
             let filename = format!("{}", dent.path().display()).replace('\\', "/");
 
-            if exclude.contains(&filename) {
-                return None;
-            }
-
-            Some(filename)
+            (!exclude.contains(&filename)).then(|| filename)
         })
         .collect();
 

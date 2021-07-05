@@ -1,6 +1,6 @@
 use crate::protos as proto_def;
 
-pub use proto_def::types::{Alert, AlertWhereClause as WhereClause};
+pub use proto_def::types::{Alert, AlertWhereClause as WhereClause, AlertWhereClause_View as View};
 
 pub mod get_alerts {
     use super::proto_def::alerts;
@@ -15,7 +15,8 @@ pub mod get_alerts_and_ratings {
     use super::proto_def::alerts;
 
     pub use alerts::{
+        GetAlertsAndRatings_AlertsRatings as AlertsRatings,
         GetAlertsAndRatings_Metadata as Metadata, GetAlertsAndRatings_Request as Request,
-        GetAlertsAndRatings_Response as Response, GetAlertsAndRatings_AlertsRatings as AlertsRatings,
+        GetAlertsAndRatings_Response as Response,
     };
 }

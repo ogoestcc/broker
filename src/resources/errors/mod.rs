@@ -1,6 +1,7 @@
 use actix_web::{http::StatusCode, HttpResponse, ResponseError};
 use std::{error::Error, fmt::Display};
 
+pub mod alerts;
 pub mod auth;
 pub mod users;
 pub mod validation;

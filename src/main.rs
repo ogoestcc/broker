@@ -15,6 +15,8 @@ use actix_web::{
     App, HttpServer,
 };
 
+use actix_cors::Cors;
+
 use env_logger::Env;
 
 use grpc::{database::DatabaseService, recommender::RecommenderService};
@@ -41,6 +43,13 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
+            .wrap(
+                Cors::default()
+                    .allow_any_origin()
+                    .allow_any_method()
+                    .allow_any_header()
+                    .send_wildcard(),
+            )
             .wrap(NormalizePath::new(TrailingSlash::MergeOnly))
             .wrap(DefaultHeaders::new().header(header::CONTENT_TYPE, r"application/json"))
             .wrap(config::logger())
