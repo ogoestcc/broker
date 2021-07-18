@@ -1,6 +1,9 @@
 use crate::protos as proto_def;
 
-pub use proto_def::types::{Alert, AlertWhereClause as WhereClause, AlertWhereClause_View as View};
+pub use proto_def::types::{
+    Alert, AlertWhereClause as WhereClause, AlertWhereClause_View as View,
+    AlertWhereClause_WhereIn as WhereIn,
+};
 
 pub mod get_alerts {
     use super::proto_def::alerts;

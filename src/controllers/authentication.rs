@@ -6,7 +6,7 @@ use actix_web::{error::Error as ActixError, post, web, HttpResponse};
 
 use crate::{
     config::Config,
-    grpc::database::DatabaseService,
+    grpc::{database::DatabaseService, recommender::RecommenderService},
     middlewares::validation::Validator,
     models::user::Claims,
     resources::errors::{auth::AuthError, ServiceError},
@@ -30,6 +30,7 @@ pub struct LoginResponse {
 pub async fn login(
     payload: Validator<web::Json<LoginBody>>,
     db: web::Data<Arc<Mutex<DatabaseService>>>,
+    recommender: web::Data<Arc<Mutex<RecommenderService>>>,
     config: web::Data<Config>,
 ) -> Result<HttpResponse, ActixError> {
     let auth = &config.auth;
@@ -42,8 +43,6 @@ pub async fn login(
         .map_err(ServiceError::from)?;
     drop(db); // unlock db mutex
 
-    
-
     let valid_password = auth.verify_password(user.get_password(), payload.password.as_bytes());
     if !valid_password {
         Err(r"Incorrect Password".to_owned())
@@ -51,8 +50,12 @@ pub async fn login(
             .map_err(ServiceError::from)?;
     }
 
+    let id = user.get_id() as u32;
+    let recommender = recommender.lock().unwrap();
+    async { recommender.load_user_data(id).await }.await?;
+
     let user_claims = Claims {
-        id: user.get_id() as u32,
+        id,
         email: user.get_email().into(),
         active: user.get_active(),
         exp: auth.get_token_exp(),

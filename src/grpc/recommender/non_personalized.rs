@@ -1,20 +1,12 @@
 use crate::resources::errors::InternalServerError;
-use protos::{recommender::top, types::alerts::Alert};
+use protos::recommender::top;
 
 use super::{Error, RecommenderService};
 
 impl RecommenderService {
-    pub async fn top_n(
-        &self,
-        n: Option<u32>,
-        content: Option<String>,
-    ) -> Result<Vec<Alert>, Error> {
+    pub async fn top_n(&self, n: Option<u32>) -> Result<Vec<String>, Error> {
         let mut request = top::Request::default();
         request.set_alerts_number(n.unwrap_or(20));
-
-        if let Some(content) = content {
-            request.set_content(content);
-        }
 
         let unary_receiver = self
             .recommender

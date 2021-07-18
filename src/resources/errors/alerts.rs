@@ -19,7 +19,6 @@ impl ErrorKind for AlertsError {
     fn message(&self) -> String {
         match self {
             Self::Internal(internal) => internal.message(),
-            _ => self.to_string(),
         }
     }
 
@@ -27,7 +26,6 @@ impl ErrorKind for AlertsError {
     fn report(&self) -> Option<Self::Report> {
         match self {
             Self::Internal(internal) => internal.report(),
-            _ => None,
         }
     }
 }
@@ -56,7 +54,6 @@ impl From<AlertsError> for ServiceError<AlertsError> {
     fn from(err: AlertsError) -> Self {
         match err {
             AlertsError::Internal(_) => Self::internal(err),
-            _ => Self::not_found(err),
         }
     }
 }

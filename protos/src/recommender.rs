@@ -18,6 +18,12 @@ pub mod content_based {
     };
 }
 
+pub mod load_data {
+    pub use crate::protos::recommender::{
+        LoadData_Request as Request, LoadData_Response as Response,
+    };
+}
+
 #[derive(Clone)]
 pub struct Recommender {
     client: recommender_grpc::RecommenderClient,

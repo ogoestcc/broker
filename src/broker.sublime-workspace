@@ -95,7 +95,7 @@
 	],
 	"find":
 	{
-		"height": 24.0
+		"height": 23.0
 	},
 	"find_in_files":
 	{
@@ -135,7 +135,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 24.0
+		"height": 23.0
 	},
 	"input":
 	{
@@ -176,6 +176,10 @@
 	{
 		"height": 0.0
 	},
+	"output.SublimeLinter":
+	{
+		"height": 0.0
+	},
 	"output.diagnostics":
 	{
 		"height": 124.0
@@ -196,7 +200,7 @@
 	"project": "broker.sublime-project",
 	"replace":
 	{
-		"height": 44.0
+		"height": 42.0
 	},
 	"save_all_on_build": true,
 	"select_file":

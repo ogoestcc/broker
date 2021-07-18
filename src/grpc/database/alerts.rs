@@ -52,4 +52,28 @@ impl DatabaseService {
 
         Ok(alerts.to_owned())
     }
+
+    pub async fn get_alerts_by_ids(
+        &mut self,
+        ids: Vec<String>,
+    ) -> Result<Vec<alerts::Alert>, ServiceError<AlertsError>> {
+        let mut req = alerts::get_alerts::Request::default();
+        let mut where_in = alerts::WhereIn::default();
+        let mut clause = alerts::WhereClause::default();
+
+        where_in.set_id(ids.into());
+        clause.set_where_in(where_in);
+        req.set_field_where(clause);
+
+        let receiver = self
+            .db
+            .alerts
+            .get_alerts_async(&req)
+            .map_err(AlertsError::from)?;
+
+        let response = receiver.await.map_err(AlertsError::from)?;
+        let alerts = response.get_alerts();
+
+        Ok(alerts.to_owned())
+    }
 }
